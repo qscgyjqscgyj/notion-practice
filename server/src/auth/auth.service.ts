@@ -3,6 +3,7 @@ import { HttpException, HttpStatus, Injectable, Req } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import { UsersService } from 'src/users/users.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { SessionUser } from './types';
 
 @Injectable()
 export class AuthService {
@@ -12,8 +13,12 @@ export class AuthService {
     return this.userService.create(createUserDto);
   }
 
-  async validateUser(email: string, password: string) {
+  async validateUser(email: string, password: string): Promise<SessionUser> {
     const user = await this.userService.findByEmail(email);
+
+    if (!user) {
+      throw new HttpException('Invalid credentials', HttpStatus.BAD_REQUEST);
+    }
 
     const passwordMatch = await this.passworMatch(password, user.password);
 
@@ -31,11 +36,7 @@ export class AuthService {
   }
 
   async login(request: Request) {
-    return {
-      message: 'Login successful',
-      statusCode: HttpStatus.OK,
-      user: request.user,
-    };
+    return request.user;
   }
 
   async logout(@Req() request: Request) {

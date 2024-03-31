@@ -4,6 +4,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { LocalAuthGuard } from 'src/auth/guards/local.guard';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { AuthenticatedGuard } from './guards/authenticated.guard';
+import { AuthRequest } from './types';
 
 @Controller('auth')
 export class AuthController {
@@ -20,14 +21,15 @@ export class AuthController {
     return this.authService.login(request);
   }
 
+  @UseGuards(AuthenticatedGuard)
   @Get('logout')
-  logout(@Req() request: Request) {
+  logout(@Req() request: AuthRequest) {
     return this.authService.logout(request);
   }
 
   @UseGuards(AuthenticatedGuard)
   @Get('profile')
-  getProfile(@Req() request: Request) {
+  getProfile(@Req() request: AuthRequest) {
     return request.user;
   }
 }

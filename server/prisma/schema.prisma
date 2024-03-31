@@ -11,18 +11,62 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  name      String?
-  password  String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id       String  @id @default(uuid())
+  email    String  @unique
+  name     String?
+  password String
+
+  notes Note[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Session {
-  sid     String   @id @default(uuid())
-  sess    Json
-  expire  DateTime
+  sid    String   @id @default(uuid())
+  sess   Json
+  expire DateTime
 
   @@map("session")
+}
+
+model Note {
+  id       String @id @default(uuid())
+  title    String
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
+
+  categories Category[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id       String @id @default(uuid())
+  title    String
+  noteId   String
+  note     Note   @relation(fields: [noteId], references: [id])
+  position Int?
+
+  links Link[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Link {
+  id         String   @id @default(uuid())
+  title      String
+  content    Json?
+  position   Int?
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  redirectToId String?
+  redirectTo   Link?   @relation("RedirectTo", fields: [redirectToId], references: [id])
+  redirects    Link[]  @relation("RedirectTo")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

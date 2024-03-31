@@ -3,10 +3,18 @@ import { ValidationPipe } from '@nestjs/common';
 import * as passport from 'passport';
 import * as session from 'express-session';
 import * as connectPgSimple from 'connect-pg-simple';
+import * as cookieParser from 'cookie-parser';
 import { AppModule } from 'src/app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.enableCors({
+    origin: process.env.CORS_ORIGIN,
+    credentials: true,
+  });
+
+  app.use(cookieParser());
 
   const pgSession = connectPgSimple(session);
   app.use(
@@ -23,6 +31,7 @@ async function bootstrap() {
         maxAge:
           parseInt(process.env.SESSION_COOKIE_MAX_AGE, 10) ||
           24 * 60 * 60 * 1000,
+        httpOnly: true,
       },
     }),
   );
