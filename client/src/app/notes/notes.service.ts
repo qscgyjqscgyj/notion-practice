@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { NoteList } from 'src/app/notes/notes.inteface';
 import { ENV } from 'src/env/env';
 
@@ -7,11 +7,9 @@ import { ENV } from 'src/env/env';
   providedIn: 'root',
 })
 export class NotesService {
-  constructor(private http: HttpClient) {}
-
-  private baseUrl = ENV.API_URL;
+  http = inject(HttpClient);
 
   getNotes() {
-    return this.http.get<NoteList[]>(`${this.baseUrl}/notes`);
+    return this.http.get<NoteList[]>(`${ENV.API_URL}/notes`);
   }
 }

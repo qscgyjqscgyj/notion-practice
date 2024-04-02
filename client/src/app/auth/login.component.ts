@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   ReactiveFormsModule,
   FormGroup,
@@ -13,11 +13,24 @@ import { AuthService } from 'src/app/auth/auth.service';
   selector: 'app-login',
   standalone: true,
   imports: [ReactiveFormsModule, RouterModule],
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css'],
+  template: `
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div>
+        <label for="email">Email:</label>
+        <input type="email" id="email" formControlName="email" />
+      </div>
+      <div>
+        <label for="password">Password:</label>
+        <input type="password" id="password" formControlName="password" />
+      </div>
+      <button type="submit" [disabled]="!loginForm.valid">Login</button>
+    </form>
+
+    <a [routerLink]="signupUrl">Register</a>
+  `,
 })
 export class LoginComponent {
-  constructor(private authService: AuthService) {}
+  authService = inject(AuthService);
 
   signupUrl = `/${ROUTES.AUTH.SIGNUP}`;
 

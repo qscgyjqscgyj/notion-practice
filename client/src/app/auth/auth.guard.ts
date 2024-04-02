@@ -1,21 +1,21 @@
-import { Injectable } from '@angular/core';
+import { Injectable, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
 import { ROUTES } from 'src/app/app.constants';
 
+class BaseAuthGuard {
+  authService = inject(AuthService);
+  router = inject(Router);
+
+  user = computed(() => this.authService.user());
+}
+
 @Injectable({
   providedIn: 'root',
 })
-export class AuthGuard {
-  constructor(private authService: AuthService, private router: Router) {}
-
-  canActivate(): boolean {
-    this.authService.isLoggedIn();
-    const user = this.authService.user;
-
-    console.log('user!!!!!!', user);
-
-    if (user === null) {
+export class AuthenticationRequiredGuard extends BaseAuthGuard {
+  async canActivate(): Promise<boolean> {
+    if (!this.user()) {
       this.router.navigate([ROUTES.AUTH.LOGIN]);
       return false;
     }
@@ -27,16 +27,9 @@ export class AuthGuard {
 @Injectable({
   providedIn: 'root',
 })
-export class AuthRedirectGuard {
-  constructor(private authService: AuthService, private router: Router) {}
-
-  canActivate(): boolean {
-    this.authService.isLoggedIn();
-    const user = this.authService.user;
-
-    console.log('user!!!!!!', user);
-
-    if (!!user) {
+export class AlreadyAuthenticatedGuard extends BaseAuthGuard {
+  async canActivate(): Promise<boolean> {
+    if (this.user()) {
       this.router.navigate(['/']);
       return false;
     }

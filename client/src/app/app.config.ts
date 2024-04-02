@@ -1,17 +1,12 @@
 import { ApplicationConfig } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { HTTP_INTERCEPTORS, provideHttpClient } from '@angular/common/http';
-import { routes } from './app.routes';
-import { WithCredentialsInterceptor } from './http-config.interceptor';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { routes } from 'src/app/app.routes';
+import { withCredentialsInterceptor } from 'src/app/http-config.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
-    provideHttpClient(),
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: WithCredentialsInterceptor,
-      multi: true,
-    },
+    provideHttpClient(withInterceptors([withCredentialsInterceptor])),
   ],
 };

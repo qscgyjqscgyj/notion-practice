@@ -40,11 +40,18 @@ export class AuthService {
   }
 
   async logout(@Req() request: Request) {
-    request.session.destroy(() => {
-      return {
-        message: 'Logout successful',
-        statusCode: HttpStatus.OK,
-      };
+    request.session.destroy((err) => {
+      if (err) {
+        throw new HttpException(
+          'Something went wrong',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
     });
+
+    return {
+      message: 'Logout successful',
+      statusCode: HttpStatus.OK,
+    };
   }
 }

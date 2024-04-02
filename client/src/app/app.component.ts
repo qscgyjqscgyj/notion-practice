@@ -1,14 +1,23 @@
-import { HttpClientModule } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [RouterOutlet],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css',
+  template: `
+    @if (authServices.status() !== 'loading') {
+    <router-outlet />
+    }
+  `,
 })
 export class AppComponent {
+  authServices = inject(AuthService);
+
   title = 'notion-client';
+
+  ngOnInit() {
+    this.authServices.authenticate();
+  }
 }

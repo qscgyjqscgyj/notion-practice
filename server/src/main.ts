@@ -6,17 +6,13 @@ import * as connectPgSimple from 'connect-pg-simple';
 import * as cookieParser from 'cookie-parser';
 import { AppModule } from 'src/app.module';
 
+const pgSession = connectPgSimple(session);
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.enableCors({
-    origin: process.env.CORS_ORIGIN,
-    credentials: true,
-  });
-
   app.use(cookieParser());
 
-  const pgSession = connectPgSimple(session);
   app.use(
     session({
       store: new pgSession({
@@ -31,13 +27,18 @@ async function bootstrap() {
         maxAge:
           parseInt(process.env.SESSION_COOKIE_MAX_AGE, 10) ||
           24 * 60 * 60 * 1000,
-        httpOnly: true,
+        httpOnly: false,
       },
     }),
   );
   app.use(passport.initialize());
   app.use(passport.session());
   app.useGlobalPipes(new ValidationPipe());
+
+  app.enableCors({
+    origin: process.env.CORS_ORIGIN,
+    credentials: true,
+  });
 
   app.setGlobalPrefix('api');
   await app.listen(5555);
